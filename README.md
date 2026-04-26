@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 ### Project structre
 
 **`api/`** — Jogou os `routers/` pra dentro de um módulo de API completo, com `schemas/` (Pydantic) separados para validação de entrada/saída e `dependencies.py` para injeção de dependências (conexão com DB, auth, etc).
@@ -16,7 +16,7 @@
 **`Makefile`** na raiz — pequeno mas faz diferença enorme no dia a dia: `make scrape`, `make api`, `make test`, `make migrate`.
 
 The `example.json` is how the json file cames from de url we get our response
-=======
+
 # pricetrail
 Kabum price trail
->>>>>>> origin/main
+
