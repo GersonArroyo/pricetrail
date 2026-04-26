@@ -1,0 +1,34 @@
+FROM python:3.13-slim
+
+# Build argument para versão da aplicação
+ARG APP_VERSION=1.0
+
+WORKDIR /app
+
+# Metadata com a versão
+LABEL version=${APP_VERSION} \
+      description="PriceTrail Scraper" \
+      maintainer="your-email@example.com"
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better cache layering
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Create non-root user
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
+# Exibir versão no startup (exemplo de uso da ARG)
+RUN echo "APP_VERSION=${APP_VERSION}" > /app/version.txt
+
+CMD ["python", "scraper/scraper.py"]

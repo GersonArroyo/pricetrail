@@ -1,0 +1,86 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres-17
+    restart: always
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    ports:
+      - 5432:5432
+
+    networks:
+      - dem
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    restart: always
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+
+    volumes:
+      - ./pgadmin-data/servers.json:/pgadmin4/servers.json
+      - pgadmin_data:/var/lib/pgadmin
+
+    ports:
+      - 5000:80
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    networks:
+      - dem
+
+
+  pricetrail:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pricetrail:optimized
+    pull_policy: build
+    container_name: pricetrail-scraper
+    restart: on-failure
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    networks:
+      - dem
+
+    volumes:
+      - ./logs:/app/logs
+
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  dem:
+    driver: bridge

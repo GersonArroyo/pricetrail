@@ -1,0 +1,15 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "sales_db",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "postgres",
+      "Username": "postgres",
+      "SSLMode": "prefer",
+      "Password": "437766",
+      "SavePassword": true
+    }
+  }
+}
