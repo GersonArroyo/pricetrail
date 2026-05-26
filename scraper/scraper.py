@@ -144,7 +144,7 @@ for department in departments:
         # se a resposta não for 200, loga o erro e tenta novamente depois de 10s
         if response.status_code != 200:
             # print(f"[ERRO] Status {response.status_code} na página {params['page_number']} da categoria {department}", flush=True)
-            logger.critical("Erro status: %s, na pagina %s, da categoria: %s",response.status_code,params['page_number'],department)
+            logger.error("Erro status: %s, na pagina %s, da categoria: %s",response.status_code,params['page_number'],department)
             break
         
         data_json = response.json()
@@ -159,12 +159,14 @@ for department in departments:
                 try:
                     save_product(cur=cur, item=item, department=department)
                 except Exception as e:
-                    print(f"[ERRO] Erro ao processar produto {item['id']} da categoria {department}: {e}", flush=True)
+                    logger.error("Erro ao processar produto %s da categoria %s: %s", item['id'], department, e)
+                    #print(f"[ERRO] Erro ao processar produto {item['id']} da categoria {department}: {e}", flush=True)
                     continue
                 
         # commit the transaction after processing each page
         conn.commit()
-        print(f"[{department.upper()}] Página {params['page_number']} - Dados salvos no banco", flush=True)
+        logger.info("[%s] Página %s - Dados salvos no banco", department.upper(), params['page_number'])
+        #print(f"[{department.upper()}] Página {params['page_number']} - Dados salvos no banco", flush=True)
         
         # if the current page number is greater than or equal to the total pages, break the loop
         if params["page_number"] >= total_pages:
@@ -176,4 +178,5 @@ for department in departments:
         # pause 1 sec for the server
         time.sleep(1)
 
-print("\n[INFO] Scraping concluído com sucesso!", flush=True)
+logger.info("\n[INFO] Scraping concluído com sucesso!")
+#print("\n[INFO] Scraping concluído com sucesso!", flush=True)
