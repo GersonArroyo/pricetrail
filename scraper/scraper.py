@@ -6,6 +6,15 @@ from urllib3.util.retry import Retry
 import time
 import psycopg
 import os
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+
+logger = logging.getLogger(__name__)
+
 
 params = {
     "page_number":1,
@@ -111,7 +120,9 @@ def save_product(cur, item: dict, department: str):
 for department in departments:
     url = f"https://servicespub.prod.api.aws.grupokabum.com.br/catalog/v2/products-by-category/{department}"
     # flush=True para garantir que as mensagens sejam exibidas em tempo real, mesmo se o output estiver sendo redirecionado para um arquivo
-    print(f"\n[INFO] Iniciando scraping da categoria: {department}", flush=True)
+    # print(f"\n[INFO] Iniciando scraping da categoria: {department}", flush=True)
+    logger.info("Iniciando scraping da categoria: %s", department)
+
     
     params["page_number"] = 1
     
@@ -120,36 +131,42 @@ for department in departments:
         try:
             response = session.get(url, params=params, timeout=30)
         except requests.exceptions.Timeout:
-            print(f"[TIMEOUT] {department} - tentando novamente em 10s", flush=True)
+            # print(f"[TIMEOUT] {department} - tentando novamente em 10s", flush=True)
+            logger.warning("Timeout na categoria %s - tentando novamente em 10s", department)
             time.sleep(10)
             continue
         except requests.exceptions.ConnectionError as e:
-            print(f"[CONEXÃO] Erro em {department}: aguardando 10s", flush=True)
+            # print(f"[CONEXÃO] Erro em {department}: aguardando 10s", flush=True)
+            logger.error("Erro em departamento %s - aguardando 10s", department)
             time.sleep(10)
             continue
         
         # se a resposta não for 200, loga o erro e tenta novamente depois de 10s
         if response.status_code != 200:
-            print(f"[ERRO] Status {response.status_code} na página {params['page_number']} da categoria {department}", flush=True)
+            # print(f"[ERRO] Status {response.status_code} na página {params['page_number']} da categoria {department}", flush=True)
+            logger.error("Erro status: %s, na pagina %s, da categoria: %s",response.status_code,params['page_number'],department)
             break
         
         data_json = response.json()
         total_pages = data_json['meta']['total_pages_count']
         data = data_json['data']
         
-        print(f"[{department.upper()}] Página {params['page_number']} - {len(data)} produtos processados", flush=True)
+        logger.info("[%s] Página %s - %s produtos processados",department.upper(),params['page_number'],len(data))
+        # print(f"[{department.upper()}] Página {params['page_number']} - {len(data)} produtos processados", flush=True)
         
         with conn.cursor() as cur:
             for item in data:
                 try:
                     save_product(cur=cur, item=item, department=department)
                 except Exception as e:
-                    print(f"[ERRO] Erro ao processar produto {item['id']} da categoria {department}: {e}", flush=True)
+                    logger.error("Erro ao processar produto %s da categoria %s: %s", item['id'], department, e)
+                    #print(f"[ERRO] Erro ao processar produto {item['id']} da categoria {department}: {e}", flush=True)
                     continue
-
+                
         # commit the transaction after processing each page
         conn.commit()
-        print(f"[{department.upper()}] Página {params['page_number']} - Dados salvos no banco", flush=True)
+        logger.info("[%s] Página %s - Dados salvos no banco", department.upper(), params['page_number'])
+        #print(f"[{department.upper()}] Página {params['page_number']} - Dados salvos no banco", flush=True)
         
         # if the current page number is greater than or equal to the total pages, break the loop
         if params["page_number"] >= total_pages:
@@ -161,4 +178,5 @@ for department in departments:
         # pause 1 sec for the server
         time.sleep(1)
 
-print("\n[INFO] Scraping concluído com sucesso!", flush=True)
+logger.info("\n[INFO] Scraping concluído com sucesso!")
+#print("\n[INFO] Scraping concluído com sucesso!", flush=True)
