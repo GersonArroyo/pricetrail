@@ -29,6 +29,7 @@ share/python-wheels/
 /pgadmin/servers.json
 MANIFEST
 secrets.yml
+Dockerfile
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
