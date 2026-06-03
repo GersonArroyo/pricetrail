@@ -1,12 +1,12 @@
 from psycopg.rows import dict_row
-from typing import List, cast
+from typing import cast
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 import time
 import psycopg
-import os
 import logging
+from config.settings import settings
 
 logging.basicConfig(
     level=logging.INFO,
@@ -35,12 +35,13 @@ adapter = HTTPAdapter(max_retries=retry_strategy)
 session.mount("http://", adapter)
 session.mount("https://", adapter)
 
+
 conn = psycopg.connect(  
-                dbname=os.getenv('POSTGRES_DB'),
-                user=os.getenv('POSTGRES_USER'),
-                password=os.getenv('POSTGRES_PASSWORD'), 
-                host=os.getenv('POSTGRES_HOST'), 
-                port=os.getenv('POSTGRES_PORT'),
+                dbname=settings.POSTGRES_DB,
+                user=settings.POSTGRES_USER,
+                password=settings.POSTGRES_PASSWORD, 
+                host=settings.POSTGRES_HOST, 
+                port=settings.POSTGRES_PORT,
                 row_factory=dict_row # type: ignore
             )
 

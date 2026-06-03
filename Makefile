@@ -1,11 +1,24 @@
+
 run:
-	python scraper.py
+	docker compose up -d
+
+scrape:
+	docker compose run --rm pricetrail
+
+stop:
+	docker compose down
+
+logs:
+	docker compose logs -f
 
 install:
 	pip install -r requirements.txt
 
 db:
-	docker-compose up -d postgres
+	docker compose up -d postgres
 
-logs:
-	docker-compose logs -f
+images:
+	docker image ls
+	
+containers:
+	docker container ls

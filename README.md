@@ -13,10 +13,47 @@
 
 **`tests/`** com `conftest.py` pra fixtures compartilhadas.
 
-**`Makefile`** na raiz — pequeno mas faz diferença enorme no dia a dia: `make scrape`, `make api`, `make test`, `make migrate`.
 
-The `example.json` is how the json file cames from de url we get our response
+## PriceTrail
 
-# pricetrail
-Kabum price trail
+Web scraper que coleta preços de produtos da Kabum, armazena o histórico ao longo do tempo e expõe os dados via API REST.
 
+## Pré-requisitos
+
+- Docker e Docker Compose
+- make (Linux/WSL: `sudo apt install make`)
+
+## Como rodar
+
+```bash
+make run        # sobe todos os containers
+make scrape     # roda o scraper manualmente
+make stop       # derruba os containers
+make logs       # acompanha os logs em tempo real
+```
+
+Para agendamento automático consulte [scheduler/README.md](scheduler/README.md).
+
+## Estrutura do projeto
+/api         — endpoints REST (em desenvolvimento)
+/config      — configurações centralizadas e logging
+/db          — schema SQL, models e queries
+/pipeline    — modelos dbt para transformação de dados
+/scheduler   — agendamento do scraper (APScheduler, cron, k8s)
+/scraper     — coleta e persistência dos dados da Kabum
+/tests       — testes automatizados
+Dockerfile        — imagem do scraper
+docker-compose.yml — orquestração local
+k8s.yml           — manifesto para deploy em Kubernetes
+Makefile          — atalhos de comandos
+secrets.yml.example — template de secrets para k8s
+
+## Stack
+
+- Python 3.13
+- PostgreSQL
+- FastAPI + Hypercorn (HTTP/3)
+- Docker / Docker Compose
+- Kubernetes
+- pgAdmin
+- dbt (pipeline de transformação)
