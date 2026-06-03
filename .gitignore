@@ -26,7 +26,10 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+/pgadmin/servers.json
 MANIFEST
+secrets.yml
+Dockerfile
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

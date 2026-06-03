@@ -116,7 +116,6 @@ def save_product(cur, item: dict, department: str):
         except Exception as e:
             cur.execute("ROLLBACK TO SAVEPOINT sp")
             raise e
-
 def run():
     for department in departments:
         url = f"https://servicespub.prod.api.aws.grupokabum.com.br/catalog/v2/products-by-category/{department}"
@@ -124,7 +123,6 @@ def run():
         # print(f"\n[INFO] Iniciando scraping da categoria: {department}", flush=True)
         logger.info("Iniciando scraping da categoria: %s", department)
 
-        
         params["page_number"] = 1
         
         # will loop until the last page is reached
