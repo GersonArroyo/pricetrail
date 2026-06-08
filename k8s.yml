@@ -1,8 +1,0 @@
-containers:
-- name: worker1
-  image: pricetrail
-  imagePullPolicy: IfNotPresent
-  command: ["python", "-c", "from scraper.scraper import run; run()"]
-  envFrom:
-    - secretRef:
-        name: pricetrail-secrets
