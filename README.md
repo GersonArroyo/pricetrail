@@ -7,8 +7,6 @@
 
 **`db/`** ganhou `models.py` (SQLAlchemy ORM) e `repository.py` (padrão repository, que isola as queries do resto do código) e `migrations/` (Alembic, pra não precisar recriar tudo com `init.sql` toda vez).
 
-**`scheduler/`** é a peça que faltava — sem ela o scraper só roda manualmente. Use APScheduler ou Celery Beat. O `jobs.py` define quando rodar cada categoria, o `config.py` define os intervalos.
-
 **`config/`** centraliza settings com Pydantic BaseSettings (lê do `.env` automaticamente) e um `logging.yml` para ter logs estruturados desde o início.
 
 **`tests/`** com `conftest.py` pra fixtures compartilhadas.
@@ -35,18 +33,16 @@ make logs       # acompanha os logs em tempo real
 Para agendamento automático consulte [scheduler/README.md](scheduler/README.md).
 
 ## Estrutura do projeto
-/api         — endpoints REST (em desenvolvimento)
-/config      — configurações centralizadas e logging
-/db          — schema SQL, models e queries
-/pipeline    — modelos dbt para transformação de dados
-/scheduler   — agendamento do scraper (APScheduler, cron, k8s)
-/scraper     — coleta e persistência dos dados da Kabum
-/tests       — testes automatizados
-Dockerfile        — imagem do scraper
-docker-compose.yml — orquestração local
-k8s.yml           — manifesto para deploy em Kubernetes
-Makefile          — atalhos de comandos
-secrets.yml.example — template de secrets para k8s
+/api                — endpoints REST (em desenvolvimento)
+/config             — configurações centralizadas e logging
+/db                 — schema SQL, models e queries
+/pipeline           — modelos dbt para transformação de dados
+/scheduler          — agendamento do scraper (linux e windows)
+/scraper            — coleta e persistência dos dados da Kabum
+/tests              — testes automatizados
+Dockerfile          — imagem do scraper
+docker-compose.yml  — orquestração local
+Makefile            — atalhos de comandos
 
 ## Stack
 
@@ -54,6 +50,5 @@ secrets.yml.example — template de secrets para k8s
 - PostgreSQL
 - FastAPI + Hypercorn (HTTP/3)
 - Docker / Docker Compose
-- Kubernetes
 - pgAdmin
 - dbt (pipeline de transformação)

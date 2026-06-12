@@ -9,6 +9,8 @@ __pycache__/
 .vscode
 logs/
 
+pgadmin-data/servers.json
+
 # Distribution / packaging
 .Python
 build/

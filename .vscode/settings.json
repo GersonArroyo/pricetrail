@@ -1,4 +1,16 @@
 {
     "makefile.configureOnOpen": false,
-    "python-envs.defaultEnvManager": "ms-python.python:system"
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "terminal.integrated.defaultProfile.linux": "bash",
+
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+
+    "python-envs.workspaceSearchPaths": [
+        "./.venv"
+    ],
+
+    "terminal.integrated.env.linux": {
+        "PATH": "${workspaceFolder}/.venv/bin:${env:PATH}",
+        "VIRTUAL_ENV": "${workspaceFolder}/.venv"
+    }
 }
